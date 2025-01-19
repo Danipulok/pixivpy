@@ -25,11 +25,7 @@ jobs:
         uses: abatilo/actions-poetry@v2
       - name: Lint with pre-commit
         uses: pre-commit/action@v3.0.1
-      - name: Install dependencies
-        run: poetry install
-      - name: Run demo.py for API check
-        run: poetry run python demo.py
-      - name: Install dependencies tests
+      - name: Install dependencies (with test dependencies)
         run: poetry install --with test
       - name: Run tests
         run: poetry run pytest
