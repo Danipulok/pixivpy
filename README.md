@@ -6,9 +6,8 @@
 >
 > To get `refresh_token`, see
 > [@ZipFile Pixiv OAuth Flow](https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362)
-> /
-> [gppt: get-pixivpy-token](https://github.com/eggplants/get-pixivpy-token) (Easy to use 👍 base on selenium)
-> /
+> / [gppt: get-pixivpy-token](https://github.com/eggplants/get-pixivpy-token)
+> (Easy to use 👍 base on selenium) /
 > [OAuth with Selenium/ChromeDriver](https://gist.github.com/upbit/6edda27cb1644e94183291109b8a5fde)
 
 _Pixiv API for Python (with Auth supported)_
@@ -122,6 +121,7 @@ Requirements: [requests](https://pypi.python.org/pypi/requests)
 
 ```python
 from pixivpy3 import AppPixivAPI
+from pixivpy3 import enums
 
 access_token = "..."
 refresh_token = "..."
@@ -136,7 +136,7 @@ print(f">>> origin url: {illust.image_urls.large}")
 
 # get ranking: 1-30
 # mode: [day, week, month, day_male, day_female, week_original, week_rookie, day_manga]
-json_result = api.illust_ranking('day')
+json_result = api.illust_ranking(mode=enums.RankingMode.DAY)
 for illust in json_result.illusts:
     print(f" p1 [{illust.title}] {illust.image_urls.medium}")
 
@@ -166,6 +166,7 @@ while next_qs:
 
 ```python
 from pixivpy3 import AppPixivAPI
+
 aapi = AppPixivAPI()
 json_result = aapi.illust_ranking()
 for illust in json_result.illusts[:3]:
@@ -178,9 +179,10 @@ for illust in json_result.illusts[:3]:
 2. Change deprecated SPAI call to Public-API call
 
 ```python
-from pixivpy3 import AppPixivAPI
+from pixivpy3 import AppPixivAPI, enums
+
 api = AppPixivAPI()
-rank_list = api.illust_ranking('day')
+rank_list = api.illust_ranking(enums.RankingMode.DAY)
 print(rank_list)
 
 # more fields about response: https://github.com/upbit/pixivpy/wiki/sniffer
@@ -207,8 +209,8 @@ Find Pixiv API in **Objective-C**? You might also like
 ```python
 from __future__ import annotations
 from typing import Any
+from pixivpy3 import enums
 from pixivpy3.utils import ParsedJson
-
 from pixivpy3.api import BasePixivAPI
 
 
@@ -222,20 +224,20 @@ class AppPixivAPI(BasePixivAPI):
 
     # 用户作品列表
     ## type: [illust, manga]
-    def user_illusts(self, user_id: int | str, type="illust") -> ParsedJson: ...
+    def user_illusts(self, user_id: int | str, type=enums.ContentType.ILLUSTRATION) -> ParsedJson: ...
 
     # 用户收藏作品列表
     # tag: 从 user_bookmark_tags_illust 获取的收藏标签
-    def user_bookmarks_illust(self, user_id: int | str, restrict="public") -> ParsedJson: ...
+    def user_bookmarks_illust(self, user_id: int | str, restrict=enums.Visibility.PUBLIC) -> ParsedJson: ...
 
     # 用户收藏作品列表中的小说
-    def user_bookmarks_novel(self, user_id: int | str, restrict="public") -> ParsedJson: ...
+    def user_bookmarks_novel(self, user_id: int | str, restrict=enums.Visibility.PUBLIC) -> ParsedJson: ...
 
     def user_related(self, seed_user_id: int | str) -> ParsedJson: ...
 
     # 关注用户的新作
     # restrict: [public, private]
-    def illust_follow(self, restrict="public") -> ParsedJson: ...
+    def illust_follow(self, restrict=enums.Visibility.PUBLIC) -> ParsedJson: ...
 
     # 作品详情 (类似PAPI.works()，iOS中未使用)
     def illust_detail(self, illust_id: int | str) -> ParsedJson: ...
@@ -248,7 +250,7 @@ class AppPixivAPI(BasePixivAPI):
 
     # 插画推荐 (Home - Main)
     # content_type: [illust, manga]
-    def illust_recommended(self, content_type="illust") -> ParsedJson: ...
+    def illust_recommended(self, content_type=enums.ContentType.ILLUSTRATION) -> ParsedJson: ...
 
     # 小说推荐
     def novel_recommended(self) -> ParsedJson: ...
@@ -258,7 +260,7 @@ class AppPixivAPI(BasePixivAPI):
     # date: '2016-08-01'
     # mode (Past): [day, week, month, day_male, day_female, week_original, week_rookie,
     #               day_r18, day_male_r18, day_female_r18, week_r18, week_r18g]
-    def illust_ranking(self, mode="day", date=None) -> ParsedJson: ...
+    def illust_ranking(self, mode=enums.RankingMode.DAY, date=None) -> ParsedJson: ...
 
     # 趋势标签 (Search - tags)
     def trending_tags_illust(self) -> ParsedJson: ...
@@ -272,13 +274,13 @@ class AppPixivAPI(BasePixivAPI):
     # duration: [within_last_day, within_last_week, within_last_month]
     # start_date, end_date: '2020-07-01'
     def search_illust(
-            self,
-            word: str,
-            search_target="partial_match_for_tags",
-            sort="date_desc",
-            duration=None,
-            start_date=None,
-            end_date=None,
+        self,
+        word: str,
+        search_target=enums.SearchTarget.PARTIAL_MATCH_FOR_TAGS,
+        sort=enums.Sort.DATE_DESC,
+        duration=None,
+        start_date=None,
+        end_date=None,
     ) -> ParsedJson: ...
 
     # 搜索小说 (Search Novel)
@@ -290,36 +292,36 @@ class AppPixivAPI(BasePixivAPI):
     # sort: [date_desc, date_asc]
     # start_date/end_date: 2020-06-01
     def search_novel(
-            self,
-            word: str,
-            search_target="partial_match_for_tags",
-            sort="date_desc",
-            start_date=None,
-            end_date=None,
+        self,
+        word: str,
+        search_target=enums.SearchTarget.PARTIAL_MATCH_FOR_TAGS,
+        sort=enums.Sort.DATE_DESC,
+        start_date=None,
+        end_date=None,
     ) -> ParsedJson: ...
 
-    def search_user(self, word: str, sort='date_desc', duration=None) -> ParsedJson: ...
+    def search_user(self, word: str, sort=enums.Sort.DATE_DESC, duration=None) -> ParsedJson: ...
 
     # 作品收藏详情
     def illust_bookmark_detail(self, illust_id: int | str) -> ParsedJson: ...
 
     # 新增收藏
-    def illust_bookmark_add(self, illust_id: int | str, restrict="public", tags=None) -> ParsedJson: ...
+    def illust_bookmark_add(self, illust_id: int | str, restrict=enums.Visibility.PUBLIC, tags=None) -> ParsedJson: ...
 
     # 删除收藏
     def illust_bookmark_delete(self, illust_id: int | str) -> ParsedJson: ...
 
     # 关注用户
-    def user_follow_add(self, user_id: int | str, restrict="public") -> ParsedJson: ...
+    def user_follow_add(self, user_id: int | str, restrict=enums.Visibility.PUBLIC) -> ParsedJson: ...
 
     # 取消关注用户
     def user_follow_delete(self, user_id: int | str) -> ParsedJson: ...
 
     # 用户收藏标签列表
-    def user_bookmark_tags_illust(self, restrict="public") -> ParsedJson: ...
+    def user_bookmark_tags_illust(self, restrict=enums.Visibility.PUBLIC) -> ParsedJson: ...
 
     # Following用户列表
-    def user_following(self, user_id: int | str, restrict="public") -> ParsedJson: ...
+    def user_following(self, user_id: int | str, restrict=enums.Visibility.PUBLIC) -> ParsedJson: ...
 
     # Followers用户列表
     def user_follower(self, user_id: int | str) -> ParsedJson: ...
@@ -350,7 +352,7 @@ class AppPixivAPI(BasePixivAPI):
 
     # 大家的新作
     # content_type: [illust, manga]
-    def illust_new(self, content_type="illust", max_illust_id=None) -> ParsedJson: ...
+    def illust_new(self, content_type=enums.ContentType.ILLUSTRATION, max_illust_id=None) -> ParsedJson: ...
 
     def novel_new(self, max_novel_id=None) -> ParsedJson: ...
 
@@ -361,7 +363,8 @@ class AppPixivAPI(BasePixivAPI):
 [Usage](https://github.com/upbit/pixivpy/blob/aec177aa7a1979f7ec4c5bbbeed9085cc256bdbd/demo.py#L306):
 
 ```python
-from pixivpy3 import AppPixivAPI
+from pixivpy3 import AppPixivAPI, enums
+
 api = AppPixivAPI()
 
 # 作品推荐
@@ -408,7 +411,7 @@ novel = json_result.novels[0]
 print(f">>> {novel.title}, text_length: {novel.text_length}, series: {novel.series}")
 
 # 2016-07-15 日的过去一周排行
-json_result = api.illust_ranking('week', date='2016-07-15')
+json_result = api.illust_ranking(enums.RankingMode.WEEK, date='2016-07-15')
 print(json_result)
 illust = json_result.illusts[0]
 print(f">>> {illust.title}, origin url: {illust.image_urls.large}")
@@ -420,7 +423,7 @@ illust = json_result.illusts[0]
 print(f">>> {illust.title}, origin url: {illust.image_urls.large}")
 
 # 标签 "水着" 搜索
-json_result = api.search_illust('水着', search_target='partial_match_for_tags')
+json_result = api.search_illust('水着', search_target=enums.SearchTarget.PARTIAL_MATCH_FOR_TAGS)
 print(json_result)
 illust = json_result.illusts[0]
 print(f">>> {illust.title}, origin url: {illust.image_urls.large}")
@@ -436,9 +439,11 @@ json_result = api.novel_comments(16509454, include_total_comments=True)
 print(f"Total comments = {json_result.total_comments}")
 for comment in json_result.comments:
     if comment.parent_comment:
-        print(f"{comment.user.name} replied to {comment.parent_comment.user.name} at {comment.date} : {comment.comment}")
+        text = f"{comment.user.name} replied to {comment.parent_comment.user.name} at {comment.date} : {comment.comment}"
+        print(text)
     else:
-        print(f"{comment.user.name} at {comment.date} : {comment.comment}")
+        text = f"{comment.user.name} at {comment.date} : {comment.comment}"
+        print(text)
 ```
 
 ## Package Publishing Instructions
